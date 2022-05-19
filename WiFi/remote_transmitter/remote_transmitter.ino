@@ -1,17 +1,20 @@
 #include <espnow.h>
 #include <ESP8266WiFi.h>
 
-#define xpin A0
-#define ypin D1
-#define swpin D2
-bool y, sw;
-short x;
+ 
+#define pin_maju D1
+#define pin_mundur D2
+#define pin_kiri D3
+#define pin_kanan D4
+#define pin_capit_gigit D5
+#define pin_capit_lepas D6
+
+bool maju, mundur, kiri, kanan, capit_gigit, capit_lepas;
 
 uint8_t broadcastAddress[] = {0x50, 0x02, 0x91, 0xC3, 0x34, 0xFA};
 
 typedef struct struct_message{
-  bool y_value, sw_value;
-  short x_value;
+  bool nilai_maju, nilai_mundur, nilai_kiri, nilai_kanan, nilai_capit_gigit, nilai_capit_lepas;
 }struct_messange;
 
 // Buat Objek
@@ -47,21 +50,31 @@ void setup() {
   esp_now_register_send_cb(OnDataSent);
   esp_now_add_peer(broadcastAddress, ESP_NOW_ROLE_SLAVE, 1, NULL, 0);
   
-  pinMode(xpin, INPUT);
-  pinMode(ypin, INPUT);
-  pinMode(swpin, INPUT_PULLUP);
+
+  pinMode(pin_maju        , INPUT_PULLUP);
+  pinMode(pin_mundur      , INPUT_PULLUP);
+  pinMode(pin_kiri        , INPUT_PULLUP);
+  pinMode(pin_kanan       , INPUT_PULLUP);
+  pinMode(pin_capit_gigit , INPUT_PULLUP);
+  pinMode(pin_capit_lepas , INPUT_PULLUP);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  x = analogRead(xpin);
-  y = digitalRead(ypin);
-  sw = digitalRead(swpin);
-  Serial.println("Nilai x : " + String(x) + "   | Nilai y : " + String(y) + "  | Nilai sw : " + String(sw));
+  maju        = digitalRead(pin_maju);
+  mundur      = digitalRead(pin_mundur);
+  kiri        = digitalRead(pin_kiri);
+  kanan       = digitalRead(pin_kanan);
+  capit_gigit = digitalRead(pin_capit_gigit);
+  capit_lepas = digitalRead(pin_capit_lepas);
+  Serial.println("Nilai maju : " + String(maju) + "   | Nilai mundur : " + String(mundur) + "  | Nilai kiri : " + String(kiri)+ "  | Nilai kanan : " + String(kanan)+ "  | Nilai gigit : " + String(capit_gigit) +  "  | Nilai lepas : " + String(capit_lepas));
  
-  myData.y_value = y;
-  myData.x_value = x;
-  myData.sw_value = sw;
+  myData.nilai_maju         = maju;
+  myData.nilai_mundur       = mundur;
+  myData.nilai_kiri         = kiri;
+  myData.nilai_kanan        = kanan;
+  myData.nilai_capit_gigit  = capit_gigit;
+  myData.nilai_capit_lepas  = capit_lepas;
   
   // Send message via ESP-NOW
   esp_now_send(broadcastAddress, (uint8_t *) &myData, sizeof(myData));
